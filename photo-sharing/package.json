@@ -2,7 +2,7 @@
   "name": "photo-sharing",
   "version": "0.1.0",
   "private": true,
-  "homepage" : "http://localhost/photo-share",
+  "homepage" : "https://photo-sharing-xiangxix.herokuapp.com/",
   "dependencies": {
     "@material-ui/core": "^4.3.2",
     "@material-ui/icons": "^4.2.1",
