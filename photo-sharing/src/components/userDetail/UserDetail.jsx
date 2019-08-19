@@ -88,7 +88,7 @@ class UserDetail extends React.Component {
       <div>
         <Grid container className={classes.grid} >
           <Grid item xs={12}>
-            <Avatar alt="user photo" src={require("../../images/xiangxiang.jpg")} className={classes.avatar} />
+            <Avatar alt="user photo" src={user.avatar_url} className={classes.avatar} />
           </Grid>
           <Grid item xs={12} className={classes.userName}>
             <span>{this.state.user.first_name} {this.state.user.last_name} </span>
@@ -116,7 +116,7 @@ class UserDetail extends React.Component {
       <GridList className={classes.gridList} cols={3}>
         {this.state.photos.map(photo => (
           <GridListTile key={photo._id}>
-            <img src={require("../../images/"+photo.file_name)} alt={photo._id} />
+            <img src={photo.url} alt={photo._id} />
           </GridListTile>
         ))}
       </GridList>

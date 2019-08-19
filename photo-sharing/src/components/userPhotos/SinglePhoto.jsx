@@ -125,7 +125,7 @@ class SinglePhoto extends React.Component {
                     <CardHeader
                         avatar={
                             <Link component={RouterLink} className={classes.link} to={`/users/${this.user._id}`}>
-                                <Avatar aria-label="User Avatar" src={require("../../images/xiangxiang.jpg")}/>
+                                <Avatar aria-label="User Avatar" src={this.user.avatar_url}/>
                             </Link>
                         }
                         action={
@@ -137,7 +137,7 @@ class SinglePhoto extends React.Component {
                         subheader={this.photo.date_time}
                     />
                     <CardMedia className={classes.media}
-                               image={require("../../images/" + this.photo.file_name)}
+                               image={this.photo.url}
                     />
                     <CardActions>
                         <IconButton color="secondary" aria-label="Like" onClick={this.handleLike}>

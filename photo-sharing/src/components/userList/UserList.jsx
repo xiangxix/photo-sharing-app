@@ -60,7 +60,7 @@ class UserList extends React.Component {
         <Link component={RouterLink} underline='none' to={`/users/${user._id}`}>
           <ListItem >
             <ListItemAvatar>
-              <Avatar>{user.first_name[0]}</Avatar>
+              <Avatar src={user.avatar_url} />
             </ListItemAvatar>
             <ListItemText primary ={user.first_name + " " + user.last_name} />
           </ListItem>

@@ -34,6 +34,9 @@
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 
+const cloudinary = require('cloudinary').v2;
+
+
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require('./schema/user.js');
 const Photo = require('./schema/photo.js');
@@ -57,7 +60,7 @@ const session = require('express-session');
  * parameter_name it will show up in the Express request handler as 
  * request.body.parameter_name
  */
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 
 // Express middleware body parser capable of handling the multi part forms 
 // we need to upload photos
@@ -138,7 +141,7 @@ app.get('/test/:p1', function (request, response) {
         // call to each collections. That is tricky to do so we use the async package
         // do the work.  We put the collections into array and use async.each to
         // do each .count() query.
-        var collections = [
+        let collections = [
             {name: 'user', collection: User},
             {name: 'photo', collection: Photo},
             {name: 'schemaInfo', collection: SchemaInfo}
@@ -152,8 +155,8 @@ app.get('/test/:p1', function (request, response) {
             if (err) {
                 response.status(500).send(JSON.stringify(err));
             } else {
-                var obj = {};
-                for (var i = 0; i < collections.length; i++) {
+                let obj = {};
+                for (let i = 0; i < collections.length; i++) {
                     obj[collections[i].name] = collections[i].count;
                 }
                 response.end(JSON.stringify(obj));
@@ -308,24 +311,32 @@ app.post('/photos/new', function (request, response) {
         }
         let timestamp = new Date().valueOf();
         let filename = 'U' + String(timestamp) + request.file.originalname;
-        fs.writeFile("./images/" + filename, request.file.buffer, function (err) {
-            // response.status(400).send(JSON.stringify(err));
+        // fs.writeFile("./images/" + filename, request.file.buffer, function (err) {
+        //     // response.status(400).send(JSON.stringify(err));
+        //     if (err) {
+        //         console.log("Writing image error.");
+        //     }
+        //     return;
+        // });
+        cloudinary.uploader.upload(request.file.path,
+            {public_id:filename, folder:"UserPhotos"},
+            function(err, result) {
             if (err) {
-                console.log("Writing image error.");
-            }
-            return;
-        });
-
-        Photo.create({
-            file_name: filename,
-            user_id: request.session.user._id,
-        }, function (error, photo) {
-            if (err) {
-                response.status(400).send("Database Update Error");
+                response.status(500).send(JSON.stringify(err));
                 return;
             }
-            photo.save();
-            response.status(200).send(photo);
+            fs.unlinkSync(path);
+            Photo.create({
+                url: result.url,
+                user_id: request.session.user._id,
+            }, function (error, photo) {
+                if (err) {
+                    response.status(400).send("Database Update Error");
+                    return;
+                }
+                photo.save();
+                response.status(200).send(photo);
+            });
         });
     });
 });
@@ -423,10 +434,11 @@ app.get('/user/list', function (request, response) {
             let user = {
                 _id: obj._id,
                 first_name: obj.first_name,
-                last_name: obj.last_name
+                last_name: obj.last_name,
+                avatar_url: obj.avatar_url
             };
             userList.push(user);
-        })
+        });
         response.status(200).send(JSON.stringify(userList));
     });
 });
@@ -539,7 +551,7 @@ app.get('/photosOfUser/:id', function (request, response) {
     }
     let id = request.params.id;
     if (!ObjectId.isValid(id)) {
-        response.status(400).send('Invaild User Id.');
+        response.status(400).send('Invalid User Id.');
         return;
     }
     Photo.find({user_id: id}, function (err, photosModelObj) {
@@ -637,7 +649,7 @@ app.post('/like/:id', function (request, response) {
         let like = {
             isLiked: isLiked,
             likes: photo.likes
-        }
+        };
         response.status(200).send(JSON.stringify(like));
     });
 });
