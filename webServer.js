@@ -43,6 +43,7 @@ const async = require('async');
 const fs = require('fs');
 const crypto = require('crypto');
 const express = require('express');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -65,7 +66,8 @@ const processFormBody = multer({storage: multer.memoryStorage()}).single('upload
 
 const ObjectId = require('mongodb').ObjectID;
 
-mongoose.connect('mongodb://localhost/cs142project6', {useNewUrlParser: true});
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/cs142project6',
+    {useNewUrlParser: true});
 
 // We have the express static module (http://expressjs.com/en/starter/static-files.html) do all
 // the work for us.
@@ -559,7 +561,6 @@ app.get('/photosOfUser/:id', function (request, response) {
                 photo.isLiked = false;
             }
             delete photo.liked_users;
-            console.log(typeof photo.date_time);
             // photo.date_time = photo.date_time.Format("yyyy-MM-dd hh:mm:ss");
             async.each(photo.comments, function (comment, comment_callback) {
                 // process the user of the comment
@@ -640,6 +641,14 @@ app.post('/like/:id', function (request, response) {
         response.status(200).send(JSON.stringify(like));
     });
 });
+
+if(process.env.NODE_ENV === 'production'){
+    app.use(express.static('photo-sharing/build'));
+
+    app.get('*', (request, response) => {
+        res.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
+    });
+}
 
 app.listen(port, function () {
     console.log('Listening at http://localhost:' + port + ' exporting the directory ' + __dirname);
