@@ -646,7 +646,7 @@ if(process.env.NODE_ENV === 'production'){
     app.use(express.static('photo-sharing/build'));
 
     app.get('*', (request, response) => {
-        res.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
+        response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
     });
 }
 
