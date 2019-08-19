@@ -644,7 +644,6 @@ app.post('/like/:id', function (request, response) {
 
 if(process.env.NODE_ENV === 'production'){
     app.use(express.static('photo-sharing/build'));
-
     app.get('*', (request, response) => {
         response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
     });
