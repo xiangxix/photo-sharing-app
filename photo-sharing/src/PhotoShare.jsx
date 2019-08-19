@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    HashRouter, Route, Switch, Redirect
+    BrowserRouter, Route, Switch, Redirect
 } from 'react-router-dom';
 import {
     Grid,
@@ -41,7 +41,7 @@ class PhotoShare extends React.Component {
     render() {
         return (
             <UserContext.Provider value={this.state}>
-                <HashRouter>
+                <BrowserRouter>
                     <div>
                         <Grid container spacing={1}>
                             <Grid item xs={12}>
@@ -93,7 +93,7 @@ class PhotoShare extends React.Component {
                             </Grid>
                         </Grid>
                     </div>
-                </HashRouter>
+                </BrowserRouter>
             </UserContext.Provider>
         );
     }
