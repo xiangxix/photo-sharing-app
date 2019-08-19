@@ -88,7 +88,7 @@ class UserDetail extends React.Component {
       <div>
         <Grid container className={classes.grid} >
           <Grid item xs={12}>
-            <Avatar alt="user photo" src={user.avatar_url} className={classes.avatar} />
+            <Avatar alt="user photo" src={this.state.user.avatar_url} className={classes.avatar} />
           </Grid>
           <Grid item xs={12} className={classes.userName}>
             <span>{this.state.user.first_name} {this.state.user.last_name} </span>
