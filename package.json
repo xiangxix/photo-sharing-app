@@ -9,7 +9,7 @@
     "start" : "nodemon webServer.js",
     "client" : "npm start --prefix photo-sharing",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix photo-sharing && npm run build --prefix photo-sharing"
+    "heroku-postbuild": "npm install --prefix photo-sharing && npm run build --prefix photo-sharing"
   },
   "repository": {
     "type": "git",

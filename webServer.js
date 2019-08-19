@@ -71,7 +71,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/cs142project6',
 
 // We have the express static module (http://expressjs.com/en/starter/static-files.html) do all
 // the work for us.
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'photo-sharing','build')));
 
 // Add the express-session and body-parser middleware to express
 app.use(session({secret: 'secretKey', resave: false, saveUninitialized: false}));
@@ -94,9 +94,9 @@ app.use(bodyParser.json());
 //     return fmt;
 // }
 
-app.get('/', function (request, response) {
-    response.send('Simple web server of files from ' + __dirname);
-});
+// app.get('/', function (request, response) {
+//     response.send('Simple web server of files from ' + __dirname);
+// });
 
 /*
  * Use express to handle argument passing in the URL.  This .get will cause express
@@ -643,7 +643,6 @@ app.post('/like/:id', function (request, response) {
 });
 
 if(process.env.NODE_ENV === 'production'){
-    app.use(express.static('photo-sharing/build'));
     app.get('*', (request, response) => {
         response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
     });
