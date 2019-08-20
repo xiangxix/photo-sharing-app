@@ -61,7 +61,8 @@ const path = require('path');
 
 // Express middleware layer that handles session management for you
 const session = require('express-session');
-
+// Add the express-session
+app.use(session({secret: 'secretKey', resave: false, saveUninitialized: false}));
 /*
  * Express middleware layer for parsing the body of HTTP requests
  * Use it to parse the JSON encoded POST request bodies that used in server API
@@ -77,17 +78,13 @@ app.use(bodyParser.json());
 const multer = require('multer');
 const processFormBody = multer({storage: multer.diskStorage({})}).single('uploadedphoto');
 
-// Add the express-session
-app.use(session({secret: 'secretKey', resave: false, saveUninitialized: false}));
 
+app.use(express.static(path.join(__dirname, 'photo-sharing','build')));
 // express static module
 if(process.env.NODE_ENV === 'production'){
-    app.use(express.static(path.join(__dirname, 'photo-sharing','build')));
     app.get('*', (request, response) => {
         response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
     });
-} else {
-    app.use(express.static(__dirname));
 }
 
 // Date.prototype.Format = function (fmt) { 
