@@ -77,8 +77,10 @@ class UserDetail extends React.Component {
     axios.get('/user/' + this.userId).then(response=>{
       this.setState({user:response.data});
     });
-    axios.get('/photosOfUser/'+this.userId).then(response => 
-      this.setState({photos : response.data}));
+    axios.get('/photosOfUser/'+this.userId).then(response => {
+          console.log(response.data);
+          this.setState({photos: response.data});
+    });
   }
 
   render() {
