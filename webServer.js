@@ -41,18 +41,18 @@ const ObjectId = require('mongodb').ObjectID;
 const User = require('./schema/user.js');
 const Photo = require('./schema/photo.js');
 const SchemaInfo = require('./schema/schemaInfo.js');
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/cs142project6',
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://heroku_xkssftvv:2963q9905i1o6tmkfggphgvj2n@ds311128.mlab.com:11128/heroku_xkssftvv',
     {useNewUrlParser: true});
 
 const cloudinary = require('cloudinary').v2;
 
-// if (! process.env.CLOUDINARY_URL) {
-//     cloudinary.config({
-//         cloud_name: 'hqcelqc7l',
-//         api_key: '393273825745427',
-//         api_secret: 'Hnpd4I-mkEHhaTs-djncH3stcbk'
-//     });
-// }
+if (! process.env.CLOUDINARY_URL) {
+    cloudinary.config({
+        cloud_name: 'hqcelqc7l',
+        api_key: '393273825745427',
+        api_secret: 'Hnpd4I-mkEHhaTs-djncH3stcbk'
+    });
+}
 
 const async = require('async');
 const fs = require('fs');
@@ -576,6 +576,7 @@ app.get('/photosOfUser/:id', function (request, response) {
             return;
         }
         let photos = JSON.parse(JSON.stringify(photosModelObj));
+        console.log(photos);
         async.each(photos, function (photo, photo_callback) {
             delete photo.__v;
             if (photo.liked_users.indexOf(request.session.user._id) > -1) {
@@ -616,6 +617,7 @@ app.get('/photosOfUser/:id', function (request, response) {
             if (err) {
                 response.status(500).send(JSON.stringify(err));
             } else {
+                console.log(photos);
                 response.status(200).send(JSON.stringify(photos));
             }
         });
