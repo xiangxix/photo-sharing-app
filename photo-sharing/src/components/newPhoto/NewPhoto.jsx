@@ -55,6 +55,7 @@ class NewPhoto extends React.Component {
         if (this.uploadInput.files.length > 0) {
             const domForm = new FormData();
             domForm.append('uploadedphoto', this.uploadInput.files[0]);
+            console.log(domForm);
             axios.post('/photos/new', domForm).then(response => {
                 console.log(response.data);
             }).catch(err => {

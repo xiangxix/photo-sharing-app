@@ -8,7 +8,7 @@
     "client-install": "npm install --prefix photo-sharing",
     "start": "nodemon webServer.js",
     "client": "npm start --prefix photo-sharing",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run start\" \"npm run client\"",
     "heroku-postbuild": "npm install --prefix photo-sharing && npm run build --prefix photo-sharing"
   },
   "repository": {

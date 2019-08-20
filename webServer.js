@@ -30,17 +30,28 @@
  *                      should have all the Comments on the Photo (JSON format)
  *
  */
+const app = express();
+const port = process.env.PORT || 5000;
 
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
-
-const cloudinary = require('cloudinary').v2;
-
-
+const ObjectId = require('mongodb').ObjectID;
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require('./schema/user.js');
 const Photo = require('./schema/photo.js');
 const SchemaInfo = require('./schema/schemaInfo.js');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/cs142project6',
+    {useNewUrlParser: true});
+
+const cloudinary = require('cloudinary').v2;
+
+// if (! process.env.CLOUDINARY_URL) {
+//     cloudinary.config({
+//         cloud_name: 'hqcelqc7l',
+//         api_key: '393273825745427',
+//         api_secret: 'Hnpd4I-mkEHhaTs-djncH3stcbk'
+//     });
+// }
 
 const async = require('async');
 const fs = require('fs');
@@ -48,8 +59,6 @@ const crypto = require('crypto');
 const express = require('express');
 const path = require('path');
 
-const app = express();
-const port = process.env.PORT || 5000;
 // Express middleware layer that handles session management for you
 const session = require('express-session');
 
@@ -61,25 +70,25 @@ const session = require('express-session');
  * request.body.parameter_name
  */
 const bodyParser = require('body-parser');
+app.use(bodyParser.json());
 
 // Express middleware body parser capable of handling the multi part forms 
 // we need to upload photos
 const multer = require('multer');
-const processFormBody = multer({storage: multer.memoryStorage()}).single('uploadedphoto');
+const processFormBody = multer({storage: multer.diskStorage({})}).single('uploadedphoto');
 
-const ObjectId = require('mongodb').ObjectID;
-
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/cs142project6',
-    {useNewUrlParser: true});
-
-// We have the express static module (http://expressjs.com/en/starter/static-files.html) do all
-// the work for us.
-app.use(express.static(path.join(__dirname, 'photo-sharing','build')));
-
-// Add the express-session and body-parser middleware to express
+// Add the express-session
 app.use(session({secret: 'secretKey', resave: false, saveUninitialized: false}));
-app.use(bodyParser.json());
 
+// express static module
+if(process.env.NODE_ENV === 'production'){
+    app.use(express.static(path.join(__dirname, 'photo-sharing','build')));
+    app.get('*', (request, response) => {
+        response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
+    });
+} else {
+    app.use(express.static(__dirname));
+}
 
 // Date.prototype.Format = function (fmt) { 
 //     var o = {
@@ -318,14 +327,16 @@ app.post('/photos/new', function (request, response) {
         //     }
         //     return;
         // });
+        console.log(request.file);
+        console.log(request.file.path);
+        console.log(typeof request.file.path);
         cloudinary.uploader.upload(request.file.path,
-            {public_id:filename, folder:"UserPhotos"},
-            function(err, result) {
+        {public_id:filename, folder:"UserPhotos"}, function(err, result) {
             if (err) {
                 response.status(500).send(JSON.stringify(err));
                 return;
             }
-            fs.unlinkSync(path);
+            fs.unlinkSync(request.file.path);
             Photo.create({
                 url: result.url,
                 user_id: request.session.user._id,
@@ -654,12 +665,6 @@ app.post('/like/:id', function (request, response) {
     });
 });
 
-if(process.env.NODE_ENV === 'production'){
-    app.get('*', (request, response) => {
-        response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
-    });
-}
-
 app.listen(port, function () {
-    console.log('Listening at http://localhost:' + port + ' exporting the directory ' + __dirname);
+    console.log(`Server started on port ${port}`);
 });
