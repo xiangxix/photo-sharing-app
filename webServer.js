@@ -30,6 +30,7 @@
  *                      should have all the Comments on the Photo (JSON format)
  *
  */
+const express = require('express');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -56,7 +57,6 @@ const cloudinary = require('cloudinary').v2;
 const async = require('async');
 const fs = require('fs');
 const crypto = require('crypto');
-const express = require('express');
 const path = require('path');
 
 // Express middleware layer that handles session management for you
