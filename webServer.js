@@ -81,11 +81,7 @@ const processFormBody = multer({storage: multer.diskStorage({})}).single('upload
 
 app.use(express.static(path.join(__dirname, 'photo-sharing','build')));
 // express static module
-if(process.env.NODE_ENV === 'production'){
-    app.get('*', (request, response) => {
-        response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
-    });
-}
+
 
 // Date.prototype.Format = function (fmt) { 
 //     var o = {
@@ -663,6 +659,12 @@ app.post('/like/:id', function (request, response) {
         response.status(200).send(JSON.stringify(like));
     });
 });
+
+if(process.env.NODE_ENV === 'production'){
+    app.get('*', (request, response) => {
+        response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
+    });
+}
 
 app.listen(port, function () {
     console.log(`Server started on port ${port}`);
