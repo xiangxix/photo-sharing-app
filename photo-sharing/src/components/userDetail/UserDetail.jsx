@@ -7,7 +7,6 @@ import {
   GridListTile,
   Button,
   Link,
-  Typography,
   Avatar,
   Divider
 } from '@material-ui/core';

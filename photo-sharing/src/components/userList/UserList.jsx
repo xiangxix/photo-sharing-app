@@ -7,12 +7,11 @@ import {
   ListItem,
   ListItemText,
   ListItemAvatar,
-  Typography,
   Avatar,
   withStyles,
 }
 from '@material-ui/core';
-import ImageIcon from '@material-ui/icons';
+// import ImageIcon from '@material-ui/icons';
 import { Link as RouterLink} from 'react-router-dom';
 import './UserList.css';
 // let fetchModel = require('../../lib/fetchModelData.js');
@@ -54,7 +53,6 @@ class UserList extends React.Component {
     if (!this.state.userList) {
       return;
     }
-    const { classes } = this.props;
     return (this.state.userList.map((user)=>
       <div key={user._id}>
         <Link component={RouterLink} underline='none' to={`/users/${user._id}`}>
