@@ -608,7 +608,7 @@ app.get('/photosOfUser/:id', function (request, response) {
             return;
         } else if (photosModelObj.length === 0) {
             console.log('Photos for user with _id:' + id + ' not found.');
-            response.status(400).send('Not found');
+            response.status(200).send(JSON.stringify([]));
             return;
         }
         let photos = JSON.parse(JSON.stringify(photosModelObj));

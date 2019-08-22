@@ -47,7 +47,8 @@ class UserList extends React.Component {
       console.log(err);
     });
   }
- 
+
+// <Link component={RouterLink}  underline='none' to={`/users/${user._id}`}>
 
   getUserList() {
     if (!this.state.userList) {
@@ -55,7 +56,7 @@ class UserList extends React.Component {
     }
     return (this.state.userList.map((user)=>
       <div key={user._id}>
-        <Link component={RouterLink} underline='none' to={`/users/${user._id}`}>
+        <Link component={RouterLink}  underline='none' to={`/users/${user._id}`}>
           <ListItem >
             <ListItemAvatar>
               <Avatar src={user.avatar_url} />
