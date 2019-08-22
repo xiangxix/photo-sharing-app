@@ -78,26 +78,21 @@ app.use(bodyParser.json());
 const multer = require('multer');
 const processFormBody = multer({storage: multer.diskStorage({})}).single('uploadedphoto');
 
-
-app.use(express.static(path.join(__dirname, 'photo-sharing','build')));
-// express static module
-
-
-// Date.prototype.Format = function (fmt) { 
-//     var o = {
-//         "M+": this.getMonth() + 1, // month
-//         "d+": this.getDate(), // day
-//         "h+": this.getHours(), // hours
-//         "m+": this.getMinutes(), // minite
-//         "s+": this.getSeconds(), // second
-//         "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
-//         "S": this.getMilliseconds() //毫秒 
-//     };
-//     if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-//     for (var k in o)
-//     if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-//     return fmt;
-// }
+Date.prototype.Format = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1, // month
+        "d+": this.getDate(), // day
+        "h+": this.getHours(), // hours
+        "m+": this.getMinutes(), // minite
+        "s+": this.getSeconds(), // second
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
 
 // app.get('/', function (request, response) {
 //     response.send('Simple web server of files from ' + __dirname);
@@ -193,8 +188,14 @@ app.post('/admin/login', function (request, response) {
         if (digest !== user.password_digest) {
             response.status(400).send("Incorrect Password");
         } else {
-            request.session.user = user;
-            response.status(200).send(user);
+            const userCopy = {
+                _id : user._id,
+                first_name : user.first_name,
+                login_name : user.login_name,
+                avatar_url : user.avatar_url
+            };
+            request.session.user = userCopy;
+            response.status(200).send(JSON.stringify(userCopy));
         }
     });
 });
@@ -221,6 +222,7 @@ app.get('/login-user', function(request, response) {
 		_id : request.session.user._id,
 		first_name : request.session.user.first_name,
 		login_name : request.session.user.login_name,
+        avatar_url : request.session.user.avatar_url
 	};
 	response.status(200).send(JSON.stringify(user));
 });
@@ -288,9 +290,15 @@ app.post('/user', function (request, response) {
                     return;
                 }
                 user.save();
-                request.session.user = user;
-                console.log("create new user successfully.")
-                response.status(200).send(user);
+                const userCopy = {
+                    _id : user._id,
+                    first_name : user.first_name,
+                    login_name : user.login_name,
+                    avatar_url : user.avatar_url
+                };
+                request.session.user = userCopy;
+                console.log("create new user successfully.");
+                response.status(200).send(JSON.stringify(userCopy));
             });
         });
     });
@@ -302,6 +310,7 @@ app.post('/photos/new', function (request, response) {
         response.status(401).send("User hasn't signed in.");
         return;
     }
+
     processFormBody(request, response, function (err) {
         if (err) {
             response.status(500).send(JSON.stringify(err));
@@ -313,16 +322,8 @@ app.post('/photos/new', function (request, response) {
         }
         let timestamp = new Date().valueOf();
         let filename = 'U' + String(timestamp) + request.file.originalname;
-        // fs.writeFile("./images/" + filename, request.file.buffer, function (err) {
-        //     // response.status(400).send(JSON.stringify(err));
-        //     if (err) {
-        //         console.log("Writing image error.");
-        //     }
-        //     return;
-        // });
-        console.log(request.file);
-        console.log(request.file.path);
-        console.log(typeof request.file.path);
+        const description = request.body.postText;
+        //use cloudinary API to upload photo, set multer storage to disk to use file.path
         cloudinary.uploader.upload(request.file.path,
         {public_id:filename, folder:"UserPhotos"}, function(err, result) {
             if (err) {
@@ -332,7 +333,9 @@ app.post('/photos/new', function (request, response) {
             fs.unlinkSync(request.file.path);
             Photo.create({
                 url: result.url,
+                public_id: result.public_id,
                 user_id: request.session.user._id,
+                description:description,
             }, function (error, photo) {
                 if (err) {
                     response.status(400).send("Database Update Error");
@@ -347,7 +350,7 @@ app.post('/photos/new', function (request, response) {
 
 
 // add new comment for a photo
-app.post('/commentsOfPhoto/:photo_id', function (request, response) {
+app.post('/photos/comment/:photo_id', function (request, response) {
     if (!request.session || !request.session.user) {
         response.status(401).send("User hasn't signed in.");
         return;
@@ -380,7 +383,6 @@ app.post('/commentsOfPhoto/:photo_id', function (request, response) {
                 console.log(JSON.stringify(err));
             }
         });
-        console.log(comments);
         let commentsCopy = JSON.parse(JSON.stringify(comments));
         async.each(commentsCopy, function (comment, comment_callback) {
             // process the user of the comment
@@ -394,6 +396,7 @@ app.post('/commentsOfPhoto/:photo_id', function (request, response) {
                     return;
                 }
                 delete comment.user_id;
+                comment.date_time = new Date(comment.date_time).Format('yyyy-MM-dd hh:mm:ss');
                 comment["user"] = {
                     _id: userObj._id,
                     first_name: userObj.first_name,
@@ -405,7 +408,6 @@ app.post('/commentsOfPhoto/:photo_id', function (request, response) {
             if (err) {
                 response.status(500).send(JSON.stringify(err));
             } else {
-                console.log(comments);
                 response.status(200).send(JSON.stringify(commentsCopy));
             }
         });
@@ -475,28 +477,41 @@ app.get('/user/:id', function (request, response) {
         }
         let user = JSON.parse(JSON.stringify(userModelObj));
         delete user.login_name;
-        delete user.password;
+        delete user.password_digest;
+        delete user.salt;
         delete user.__v;
         response.status(200).send(JSON.stringify(user));
     });
 });
 
 
-app.post('/photo/delete/:id', function (request, response) {
+app.post('/photos/delete/:id', function (request, response) {
     if (!request.session || !request.session.user) {
         response.status(401).send("User hasn't signed in.");
         return;
     }
-    let photoId = request.params.id;
-    if (!ObjectId.isValid(id)) {
+    const photoId = request.params.id;
+    const publicId = request.body.public_id;
+    if (!ObjectId.isValid(photoId)) {
         response.status(400).send('Invaild Photo Id.');
         return;
     }
-    Photo.remove({_id: photoId}, function (err) {
+    Photo.deleteOne({_id: photoId}, function (err, photo) {
         if (err) {
             response.status(400).send('Delete photo with ID:' + id + 'not successfully.');
             return;
         }
+        if (photo.user_id !== request.session.user_id) {
+            response.status(400).send('Can not delete a photo that do not belongs to you!');
+            return;
+        }
+        cloudinary.uploader.destroy(publicId, function(err, result) {
+            if (err) {
+                response.status(400).send('Delete error');
+                return;
+            }
+            response.status(200).send("Delete photo successfully!");
+        })
     });
 });
 
@@ -527,6 +542,34 @@ app.post('/comment/delete/:id', function (request, response) {
         photo.save(function (err) {
             console.log(JSON.stringify(err));
         });
+        let commentsCopy = JSON.parse(JSON.stringify(photo.comments));
+        async.each(commentsCopy, function (comment, comment_callback) {
+            // process the user of the comment
+            User.findOne({_id: comment.user_id}, function (err, userObj) {
+                if (err) {
+                    comment_callback(err);
+                    return;
+                } else if (userObj.length) {
+                    console.log('User with _id:' + comment.user_id + ' not found.');
+                    response.status(400).send('Not found');
+                    return;
+                }
+                delete comment.user_id;
+
+                comment.date_time = new Date(comment.date_time).Format('yyyy-MM-dd hh:mm:ss');
+                comment["user"] = {
+                    _id: userObj._id,
+                    first_name: userObj.first_name,
+                    last_name: userObj.last_name
+                };
+                comment_callback();
+            });
+        }, function (err) {
+            if (err) {
+                response.status(500).send(JSON.stringify(err));
+            } else {
+                response.status(200).send(JSON.stringify(commentsCopy));
+            }});
     });
 });
 
@@ -569,9 +612,9 @@ app.get('/photosOfUser/:id', function (request, response) {
             return;
         }
         let photos = JSON.parse(JSON.stringify(photosModelObj));
-        console.log(photos);
         async.each(photos, function (photo, photo_callback) {
             delete photo.__v;
+            photo.date_time = new Date(photo.date_time).Format('yyyy-MM-dd hh:mm:ss');
             if (photo.liked_users.indexOf(request.session.user._id) > -1) {
                 photo.isLiked = true;
             } else {
@@ -591,6 +634,7 @@ app.get('/photosOfUser/:id', function (request, response) {
                         return;
                     }
                     delete comment.user_id;
+                    comment.date_time = new Date(comment.date_time).Format('yyyy-MM-dd hh:mm:ss');
                     comment["user"] = {
                         _id: userObj._id,
                         first_name: userObj.first_name,
@@ -610,7 +654,6 @@ app.get('/photosOfUser/:id', function (request, response) {
             if (err) {
                 response.status(500).send(JSON.stringify(err));
             } else {
-                console.log(photos);
                 response.status(200).send(JSON.stringify(photos));
             }
         });
@@ -661,9 +704,12 @@ app.post('/like/:id', function (request, response) {
 });
 
 if(process.env.NODE_ENV === 'production'){
+    app.use(express.static(path.join(__dirname, 'photo-sharing','build')));
     app.get('*', (request, response) => {
         response.sendFile(path.join(__dirname, 'photo-sharing', 'build', 'index.html'));
     });
+} else {
+    app.use(express.static(__dirname));
 }
 
 app.listen(port, function () {

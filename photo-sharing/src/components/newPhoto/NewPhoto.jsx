@@ -8,17 +8,29 @@ import {
     DialogActions,
     DialogContentText,
     Button,
+    IconButton,
     TextField,
     withStyles
 } from '@material-ui/core';
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 
 const style = {
     input: {
         display: "none",
     },
-    button: {
+    addPhoto: {
         outline: 'none',
+        margin:5,
+        color:'black',
     },
+    dialogtitle:{
+        backgroundColor:'black',
+        color:'white',
+    },
+    postContent: {
+        marginBottom:20,
+    }
+
 };
 
 
@@ -38,7 +50,7 @@ class NewPhoto extends React.Component {
     }
 
     handleClose() {
-        this.setState({open: false});
+        this.setState({open: false, postText:''});
     }
 
     handleNewPhoto() {
@@ -55,23 +67,24 @@ class NewPhoto extends React.Component {
         if (this.uploadInput.files.length > 0) {
             const domForm = new FormData();
             domForm.append('uploadedphoto', this.uploadInput.files[0]);
+            domForm.append('postText', this.state.postText);
             console.log(domForm);
             axios.post('/photos/new', domForm).then(response => {
                 console.log(response.data);
             }).catch(err => {
-                console.log(`POST ERR: ${err}`);
+                console.log(`POST ERR: ${err.data}`);
             });
         }
-        this.setState({open: false});
+        this.setState({open: false, postText:''});
     }
 
     render() {
         const {classes} = this.props;
         return (
             <div>
-                <Button variant="contained" color="primary" onClick={this.handleNewPhoto} className={classes.button}>
-                    New Photo
-                </Button>
+                <IconButton onClick={this.handleNewPhoto} className={classes.addPhoto}>
+                    <AddAPhotoIcon />
+                </IconButton>
                 <Dialog
                     open={this.state.open}
                     keepMounted
@@ -79,7 +92,9 @@ class NewPhoto extends React.Component {
                     aria-labelledby="alert-dialog-slide-title"
                     aria-describedby="alert-dialog-slide-description"
                 >
-                    <DialogTitle id="alert-dialog-slide-title">{"Upload Photo"}</DialogTitle>
+                    <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
+                        {"New Photo"}
+                    </DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-slide-description">
                             Please choose the photo you want to share and tell your friends something about it!
@@ -89,10 +104,10 @@ class NewPhoto extends React.Component {
                             fullWidth
                             multiline
                             rowsMax="4"
+                            value={this.state.postText}
                             onChange={this.handleChange}
                             className={classes.postContent}
-                            // margin="normal"
-                            variant="filled"
+                            variant="outlined"
                         />
                         <input
                             type="file"
@@ -105,10 +120,11 @@ class NewPhoto extends React.Component {
                             }}
                         />
                         <label htmlFor="contained-button-file">
-                            <Button variant="contained" component="span" className={classes.button}>
+                            <Button variant="contained" color="primary" component="span" className={classes.button}>
                                 Choose a Photo
                             </Button>
                         </label>
+                        <img alt=""></img>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.handleUpload} color="primary">

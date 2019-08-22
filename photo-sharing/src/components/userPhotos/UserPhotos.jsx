@@ -24,25 +24,25 @@ class UserPhotos extends React.Component {
     super(props);
     this.userId = this.props.match.params.userId;
     this.state = {
-                  photos : [], 
-                  user : {} ,
-                };
+      photos : [],
+      user : {} ,
+      // setPhotos: (photos)=>this.setState({photos:photos}),
+    };
   }
 
   componentDidMount() {
-    let url = "/photosOfUser/"+this.userId;
-    axios.get(url).then(response => 
+    axios.get("/photosOfUser/"+this.userId).then(response =>
       this.setState({photos : response.data}));
 
-    url = "/user/"+this.userId;
-    axios.get(url).then(response => {
+    axios.get("/user/"+this.userId).then(response => {
       this.setState({user: response.data});
     });
   }
 
   getPhotoList() {
-    if (this.state.photos) {
+    if (this.state.photos.length && Object.keys(this.state.user).length) {
       // map这里不能用{扩起来}
+      console.log(this.state.user);
       return (
         this.state.photos.map( photo =>
             <div key={photo._id}>

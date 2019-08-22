@@ -6,24 +6,28 @@ import {
     Toolbar,
     Typography,
     Button,
+    ClickAwayListener,
     IconButton,
     Link,
-    Menu,
+    Popper,
+    Paper,
+    Grow,
+    MenuList,
     MenuItem,
 } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import {Link as RouterLink} from 'react-router-dom';
 import NewPhoto from '../newPhoto/NewPhoto';
-// import NewPhoto from '../newPhoto/NewPhoto';
 import UserContext from "../../UserContext";
 import './TopBar.css';
 import axios from 'axios';
+import Avatar from "@material-ui/core/Avatar";
 
 
 const styles = {
     root: {
         flexGrow: 1,
+        backgroundColor:'white',
+        justifyContent: 'center',
     },
     menuButton: {
         marginRight: 16,
@@ -32,10 +36,15 @@ const styles = {
         flexGrow: 1,
     },
     link: {
-        underline: 'none',
+        textDecoration:'none',
     },
     button: {
+        margin:5,
         outline: 'none',
+        // fontWeight:'bold',
+        fontSize:'large',
+        textTransform: 'none',
+        fontFamily: 'Comic Sans MS, Comic Sans, cursive',
     }
 };
 
@@ -45,7 +54,8 @@ const styles = {
 class TopBar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {anchorEl:null};
+        this.state = {open:false};
+        this.anchorRef = React.createRef();
         this.handleLogout = this.handleLogout.bind(this);
         this.handleMenu = this.handleMenu.bind(this);
         this.handleClose = this.handleClose.bind(this);
@@ -60,42 +70,37 @@ class TopBar extends React.Component {
         });
     }
 
-    handleMenu(event) {
-        this.setState({anchorEl:event.currentTarget});
+    handleMenu() {
+        this.setState({open:!this.state.open});
     }
     handleClose() {
-        this.setState({anchorEl:null});
+        this.setState({open:false});
     }
-
 
     render() {
         const {classes} = this.props;
         return (
             <UserContext.Consumer>
                 {(context) => (
-                    <AppBar className={classes.root} position="absolute">
+                    <AppBar className={classes.root} position="fixed">
                         <Toolbar>
-                            <IconButton
-                                edge="start"
-                                className={classes.menuButton}
-                                color="inherit"
-                                aria-label="Open drawer"
-                            >
-                                <MenuIcon/>
-                            </IconButton>
-                            <Typography className={classes.title} variant="h5" color="inherit">
-                                Photo APP
-                            </Typography>
+                            <Link component={RouterLink} to='/'>
+                                <img alt="web log" src={require("../../logo.png")} height="90"></img>
+                            </Link>
+                            <div className={classes.title} />
+                            {/*<Typography variant="h5" color="textPrimary" className={classes.title} >*/}
+                            {/*    PhotoShare*/}
+                            {/*</Typography>*/}
                             { context.user.login_name &&  <NewPhoto/> }
                             { !context.user.login_name &&
                                 <React.Fragment>
-                                    <Link component={RouterLink} to='/login' className={classes.link}>
-                                        <Button variant="contained" color="primary" className={classes.button}>
+                                    <Link component={RouterLink} to='/login' underline='none' className={classes.link}>
+                                        <Button  className={classes.button}>
                                             Sign In
                                         </Button>
                                     </Link>
-                                    <Link component={RouterLink} to='/register' className={classes.link}>
-                                        <Button variant="contained" color="primary" className={classes.button}>
+                                    <Link component={RouterLink} to='/register' underline='none' className={classes.link}>
+                                        <Button className={classes.button}>
                                             Sign Up
                                         </Button>
                                     </Link>
@@ -105,40 +110,35 @@ class TopBar extends React.Component {
                             {
                                 context.user.login_name &&
                                 <React.Fragment>
-                                    <Typography variant="h5" color="inherit">
+                                    <Typography variant="h6" color="textPrimary">
                                         Hello,{context.user.first_name}
                                     </Typography>
+
                                     <IconButton
-                                        aria-label="account of current user"
-                                        aria-controls="menu-appbar"
+                                        ref={this.anchorRef}
+                                        aria-controls="menu-list-grow"
                                         aria-haspopup="true"
                                         onClick={this.handleMenu}
-                                        color="inherit"
                                     >
-                                        <AccountCircle />
+                                        <Avatar src={context.user.avatar_url} />
                                     </IconButton>
-                                    <Menu
-                                        id="menu-appbar"
-                                        anchorEl={this.state.anchorEl}
-                                        anchorOrigin={{
-                                            vertical: 'bottom',
-                                            horizontal: 'center',
-                                        }}
-                                        keepMounted
-                                        transformOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'center',
-                                        }}
-                                        open={Boolean(this.state.anchorEl)}
-                                        onClose={this.handleClose}
-                                    >
-                                        <MenuItem onClick={this.handleClose}>Profile</MenuItem>
-                                        <MenuItem onClick={this.handleClose}>My account</MenuItem>
-                                        <MenuItem onClick={()=>this.handleLogout(context.setUser)}>
-                                            Logout
-                                        </MenuItem>
-                                    </Menu>
-
+                                    <Popper open={this.state.open}
+                                            anchorEl={this.anchorRef.current}
+                                            transition
+                                            disablePortal>
+                                        <Paper id="menu-list-grow">
+                                            <ClickAwayListener onClickAway={this.handleClose}>
+                                                <MenuList>
+                                                    <Link component={RouterLink} to={'/users/'+context.user._id} color='textPrimary' underline='none' className={classes.link}>
+                                                        <MenuItem onClick={this.handleClose}>Profile</MenuItem>
+                                                    </Link>
+                                                    <MenuItem onClick={()=>this.handleLogout(context.setUser)}>
+                                                        Logout
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </ClickAwayListener>
+                                        </Paper>
+                                    </Popper>
                                 </React.Fragment>
                             }
                         </Toolbar>

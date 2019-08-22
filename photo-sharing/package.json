@@ -2,7 +2,7 @@
   "name": "photo-sharing",
   "version": "0.1.0",
   "private": true,
-  "homepage" : "https://photo-sharing-xiangxix.herokuapp.com/",
+  "homepage": "https://photo-sharing-xiangxix.herokuapp.com/",
   "dependencies": {
     "@material-ui/core": "^4.3.2",
     "@material-ui/icons": "^4.2.1",
@@ -11,7 +11,8 @@
     "react-dom": "^16.9.0",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "3.1.1"
+    "react-scripts": "3.1.1",
+    "react-slideshow-image": "^1.2.2"
   },
   "scripts": {
     "start": "react-scripts start",
