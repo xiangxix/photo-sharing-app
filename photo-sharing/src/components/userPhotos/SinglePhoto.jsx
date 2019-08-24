@@ -118,7 +118,7 @@ class SinglePhoto extends React.Component {
     }
 
     handleLike() {
-        axios.post('/like/' + this.state.photo._id, {}).then(res => {
+        axios.post('/photo/like/' + this.state.photo._id, {}).then(res => {
             this.setState({isLiked: res.data.isLiked, likes: res.data.likes});
         });
     }
@@ -132,7 +132,7 @@ class SinglePhoto extends React.Component {
         if (!this.state.newComment.length) {
             return;
         }
-        const url = 'comment/' + id;
+        const url = '/comment/new/' + id;
         axios.post(url, {
             comment: this.state.newComment
         }).then(response => {
@@ -162,7 +162,7 @@ class SinglePhoto extends React.Component {
     }
 
     handleDeletePhoto(id,public_id) {
-        axios.post('/photos/delete/'+id,{
+        axios.post('/photo/delete/'+id,{
             public_id:public_id,
         }).then(response=> {
             this.setState({photo:{}});

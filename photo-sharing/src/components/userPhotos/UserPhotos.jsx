@@ -26,12 +26,11 @@ class UserPhotos extends React.Component {
     this.state = {
       photos : [],
       user : {} ,
-      // setPhotos: (photos)=>this.setState({photos:photos}),
     };
   }
 
   componentDidMount() {
-    axios.get("/photosOfUser/"+this.userId).then(response =>
+    axios.get("/photo/"+this.userId).then(response =>
       this.setState({photos : response.data}));
 
     axios.get("/user/"+this.userId).then(response => {

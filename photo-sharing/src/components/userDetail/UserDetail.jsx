@@ -83,6 +83,11 @@ const styles = {
   },
   gridList: {
     width: "100%",
+    height:'100%',
+  },
+  tile:{
+    // width:'20vh',
+    // height:'20vh',
   },
 };
 
@@ -101,7 +106,7 @@ class UserDetail extends React.Component {
     console.log("1");
     const id = this.props.match.params.userId;
     axios.all([axios.get('/user/' + id),
-      axios.get('/photosOfUser/' + id)])
+      axios.get('/photo/' + id)])
       .then(axios.spread((res1, res2) => {
         this.setState({
           user: res1.data,
@@ -112,13 +117,11 @@ class UserDetail extends React.Component {
 
   componentDidUpdate = prevProps => {
     const id = this.props.match.params.userId;
-    console.log(2);
-    console.log(id);
-    console.log(prevProps.match.params.userId);
     if (id !== prevProps.match.params.userId) {
+      console.log("2");
       axios.all(
         [axios.get('/user/' + id),
-          axios.get('/photosOfUser/' + id)]
+          axios.get('/photo/' + id)]
       ).then(
         axios.spread((res1, res2) => {
           this.setState({
@@ -129,8 +132,7 @@ class UserDetail extends React.Component {
       ).catch(err => {
         console.log(err);
       });
-    }
-    ;
+    };
   };
 
   render() {
@@ -160,7 +162,7 @@ class UserDetail extends React.Component {
           </Grid>
           <Grid item xs={12}>
             <Button variant="contained" color="primary" className={classes.photoButton}>
-              <Link component={RouterLink} className={classes.link} to={`/photos/${this.props.match.params.userId}`}>
+              <Link component={RouterLink} className={classes.link} to={`/photo/${this.props.match.params.userId}`}>
                 Photos
               </Link>
             </Button>
@@ -170,8 +172,8 @@ class UserDetail extends React.Component {
         <div className={classes.gridListRoot}>
           <GridList className={classes.gridList} cols={3}>
             {this.state.photos.map(photo => (
-              <GridListTile key={photo._id}>
-                <img width='100%' src={photo.url} alt={photo._id}/>
+              <GridListTile className={classes.tile} key={photo._id}>
+                <img height='100%' src={photo.url} alt={photo._id} />
               </GridListTile>
             ))}
           </GridList>

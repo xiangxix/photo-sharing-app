@@ -11,7 +11,6 @@ import {
     Link,
     Popper,
     Paper,
-    Grow,
     MenuList,
     MenuItem,
 } from '@material-ui/core';
@@ -34,6 +33,7 @@ const styles = {
     },
     title: {
         flexGrow: 1,
+        flexDirection:'col',
     },
     link: {
         textDecoration:'none',
@@ -129,7 +129,7 @@ class TopBar extends React.Component {
                                         <Paper id="menu-list-grow">
                                             <ClickAwayListener onClickAway={this.handleClose}>
                                                 <MenuList>
-                                                    <Link component={RouterLink} to={'/users/'+context.user._id} color='textPrimary' underline='none' className={classes.link}>
+                                                    <Link component={RouterLink} to={'/user/'+context.user._id} color='textPrimary' underline='none' className={classes.link}>
                                                         <MenuItem onClick={this.handleClose}>Profile</MenuItem>
                                                     </Link>
                                                     <MenuItem onClick={()=>this.handleLogout(context.setUser)}>

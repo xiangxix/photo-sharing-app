@@ -16,15 +16,14 @@ import UserContext from "../../UserContext";
 
 const styles = {
     root: {
-        maxHeight: '99%',
-        overflow: 'auto',
-        marginTop: 64,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
     },
     avatar: {
         margin: 8,
+        width:80,
+        height:80,
     },
     form: {
         width: '100%',
@@ -65,7 +64,7 @@ class SignIn extends React.Component {
         }).then(response => {
             setUser(response.data);
             this.setState({user: response.data, message: "Login successfully."});
-            this.props.history.push("/users/" + this.state.user._id);
+            this.props.history.push("/");
         }).catch(err => {
             console.log(err);
             if (err.response) {
@@ -81,11 +80,10 @@ class SignIn extends React.Component {
             <UserContext.Consumer>
                 {(context) => (
                     <div className={classes.root}>
-                        <Avatar className={classes.avatar}>
-                            <LockOutlinedIcon/>
-                        </Avatar>
+                        <Avatar className={classes.avatar}
+                                src="https://res.cloudinary.com/hqcelqc7l/image/upload/v1566586893/avatar/wprh2gjwcvccbp0xxet9.png"/>
                         <Typography component="h1" variant="h5">
-                            Sign in
+                            SIGN IN
                         </Typography>
                         <form method='POST' className={classes.form} onSubmit={(e) => this.handleSubmit(context.setUser,e)}>
                             <TextField
@@ -113,10 +111,6 @@ class SignIn extends React.Component {
                                 id="password"
                                 autoComplete="current-password"
                                 onChange={this.handleChange}
-                            />
-                            <FormControlLabel
-                                control={<Checkbox value="remember" color="primary"/>}
-                                label="Remember me"
                             />
 
                             <Button

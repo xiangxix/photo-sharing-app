@@ -39,8 +39,6 @@ class UserList extends React.Component {
   }
 
   componentDidMount() {
-    // fetch data and update state
-    // let url = "http://localhost:3000/user/list";
     axios.get('/user/list').then(response => {
       this.setState({ userList: response.data});
     }).catch(function(err) {
@@ -56,7 +54,7 @@ class UserList extends React.Component {
     }
     return (this.state.userList.map((user)=>
       <div key={user._id}>
-        <Link component={RouterLink}  underline='none' to={`/users/${user._id}`}>
+        <Link component={RouterLink}  underline='none' to={`/user/${user._id}`}>
           <ListItem >
             <ListItemAvatar>
               <Avatar src={user.avatar_url} />

@@ -2,11 +2,9 @@ import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Paper from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import {withStyles} from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -15,15 +13,16 @@ import UserContext from "../../UserContext";
 
 const styles = {
     root: {
-        maxHeight: '80%',
+        maxHeight: '99%',
         overflow: 'auto',
-        marginTop: 64,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
     },
     avatar: {
         margin: 8,
+        width:80,
+        height:80,
     },
     form: {
         width: '100%', // Fix IE 11 issue.
@@ -56,7 +55,7 @@ class SignUp extends React.Component {
     }
 
     handleSubmit(setUser, event) {
-        axios.post('/user', {
+        axios.post('/admin/register', {
             login_name: this.state.login_name,
             password: this.state.password,
             first_name: this.state.first_name,
@@ -68,7 +67,7 @@ class SignUp extends React.Component {
             console.log(response.data);
             setUser(response.data);
             this.setState({user: response.data});
-            this.props.history.push("/users/" + this.state.user._id);
+            this.props.history.push("/");
         }).catch(err => {
             // this.setState({error_message:err});
             console.log(err);
@@ -89,11 +88,10 @@ class SignUp extends React.Component {
             <UserContext.Consumer>
                 {(context) => (
                     <div className={classes.root}>
-                        <Avatar className={classes.avatar}>
-                            <LockOutlinedIcon/>
-                        </Avatar>
+                        <Avatar className={classes.avatar}
+                                src="https://res.cloudinary.com/hqcelqc7l/image/upload/v1566586893/avatar/wprh2gjwcvccbp0xxet9.png"/>
                         <Typography component="h1" variant="h5">
-                            Sign up
+                            SIGN UP
                         </Typography>
                         <form
                             className={classes.form}
@@ -121,7 +119,6 @@ class SignUp extends React.Component {
                                         fullWidth
                                         id="firstName"
                                         label="First Name"
-                                        autoFocus
                                         onChange={this.handleChange}
                                     />
                                 </Grid>
@@ -146,7 +143,6 @@ class SignUp extends React.Component {
                                         fullWidth
                                         id="location"
                                         label="Location"
-                                        autoFocus
                                         onChange={this.handleChange}
                                     />
                                 </Grid>
@@ -200,12 +196,6 @@ class SignUp extends React.Component {
                                         id="password"
                                         autoComplete="current-password"
                                         onChange={this.handleChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <FormControlLabel
-                                        control={<Checkbox value="allowExtraEmails" color="primary"/>}
-                                        label="I want to receive inspiration, marketing promotions and updates via email."
                                     />
                                 </Grid>
                             </Grid>

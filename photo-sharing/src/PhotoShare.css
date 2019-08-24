@@ -5,11 +5,10 @@ Since CSS uses a global name space for classes we should use class names startin
 cs142-main- here.
 */
 
-.cs142-main-topbar-buffer {
+.photo-share-topbar-buffer {
   margin-top: 100px;
 }
-
-.cs142-main-grid-item {
+.photo-share-main-grid-item {
   height: calc(100vh - 85px);
   padding: 10px;
 }
